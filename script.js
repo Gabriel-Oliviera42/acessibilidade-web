@@ -1,4 +1,4 @@
-document.getElementById("siteForm").addEventListener("submit", function(e) {
+document.getElementById("siteForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const url = document.getElementById("url").value;
@@ -10,12 +10,19 @@ document.getElementById("siteForm").addEventListener("submit", function(e) {
     <strong>${url}</strong>
   `;
 
-  // Coloque aqui sua chave do screenshotapi.net
   const apiKey = "0WHMWHX-4EGM5SM-N6NKE3F-2HK9QKW";
-  const imageUrl = `https://shot.screenshotapi.net/screenshot?token=${apiKey}&url=${encodeURIComponent(url)}&full_page=true`;
+  const apiUrl = `https://shot.screenshotapi.net/screenshot?token=${apiKey}&url=${encodeURIComponent(url)}&full_page=true&output=json`;
 
-  preview.innerHTML = `
-    <h3>Screenshot:</h3>
-    <img src="${imageUrl}" alt="Screenshot de ${url}" style="max-width:100%; border:1px solid #ccc; border-radius:8px;">
-  `;
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    // "data.screenshot" geralmente é o campo correto
+    preview.innerHTML = `
+      <h3>Screenshot:</h3>
+      <img src="${data.screenshot}" alt="Screenshot de ${url}" style="max-width:100%; border:1px solid #ccc; border-radius:8px;">
+    `;
+  } catch (err) {
+    preview.innerHTML = `<p style="color:red;">Erro: ${err.message}</p>`;
+  }
 });
