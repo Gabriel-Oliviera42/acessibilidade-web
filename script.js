@@ -25,4 +25,18 @@ document.getElementById("siteForm").addEventListener("submit", async function(e)
   } catch (err) {
     preview.innerHTML = `<p style="color:red;">Erro: ${err.message}</p>`;
   }
+
+  // --- teste rápido com o Gemini (texto) ---
+  const { GoogleGenerativeAI } = window;
+  const genAI = new GoogleGenerativeAI("AIzaSyBDQYKwIZiJVFQ7lkvUNBy47pcWWchmFsU"); // temporário no front
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const res = await model.generateContent('Diga apenas "OK" se você está funcionando.');
+  const texto = res.response.text();
+  preview.innerHTML += `
+    <h3>Resultado da IA (teste):</h3>
+    <p>${texto}</p>
+  `;
+
+  
 });
