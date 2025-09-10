@@ -3,9 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai@0.7.2/dist/browser.bundle.min.js"></script>
-
   <title>Acessibilidade Checker</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -23,9 +20,18 @@
 
     <section id="resultado"></section>
     <section id="preview"></section>
-
   </main>
 
-  <script src="script.js"></script>
+  <!-- Import map para o pacote -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    }
+  }
+  </script>
+
+  <!-- Seu script agora será ES module -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
