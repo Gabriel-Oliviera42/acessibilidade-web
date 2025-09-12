@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -32,63 +31,22 @@ app.post('/analyze', async (req, res) => {
     }
 
     try {
+        // Chave da API de screenshot que comprovadamente funciona com screenshotapi.net
+        const SCREENSHOT_API_TOKEN = '0RMJ6EW-MC2MSHH-GCFJMN9-3JZJPTZ';
+
         // === PASSO 1: OBTÉM UM SCREENSHOT DA PÁGINA ===
-        const screenshotResponse = await fetch('https://api.apiflash.com/v1/urltoimage', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                access_key: 'sua-chave-aqui', // **Substitua pela sua chave**
-                url: url,
-                format: 'jpeg',
-                full_page: true
-            })
-        });
+        // Usamos a API do screenshotapi.net com a chave e formato corretos
+        const screenshotResponse = await fetch(`https://shot.screenshotapi.net/screenshot?token=${SCREENSHOT_API_TOKEN}&url=${url}&output=json&full_page=true`);
 
         const screenshotData = await screenshotResponse.json();
 
         if (!screenshotResponse.ok) {
             console.error('Erro na API de screenshot:', screenshotData);
-            throw new Error(`Erro na API de screenshot: ${screenshotData.error.message}`);
+            throw new Error(`Erro na API de screenshot: ${screenshotData.error}`);
         }
 
-        // === PASSO 2: CONVERTE A IMAGEM PARA BASE64 ===
-        // Baixa a imagem da URL retornada pela API de screenshot.
-        const imageResponse = await fetch(screenshotData.screenshot);
-        // CONSERTO: Usa .arrayBuffer() para obter dados binários, já que .buffer() não existe no fetch nativo do Node.js.
-        const imageArrayBuffer = await imageResponse.arrayBuffer();
-        const imageBuffer = Buffer.from(imageArrayBuffer);
-        // Converte o buffer da imagem para o formato Base64.
-        const base64Image = imageBuffer.toString('base64');
-        const mimeType = 'image/jpeg';
-        const imageDataUrl = `data:${mimeType};base64,${base64Image}`;
-
-        // === PASSO 3: CHAMA A API DO GEMINI PARA ANÁLISE ===
-        const geminiResponse = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [
-                        { text: `Analise a imagem a seguir e avalie a acessibilidade web, focando em contraste de cores, tamanho e clareza da fonte, e layout geral. Forneça a análise em um parágrafo e, em seguida, liste 3-5 sugestões práticas para melhorar a acessibilidade da página.` },
-                        { inlineData: { mimeType, data: base64Image } }
-                    ]
-                }]
-            })
-        });
-
-        const geminiData = await geminiResponse.json();
-
-        if (!geminiResponse.ok) {
-            console.error('Erro na API do Gemini:', geminiData);
-            throw new Error(`Erro na API do Gemini: ${geminiData.error.message}`);
-        }
-
-        const analysisText = geminiData.candidates[0].content.parts[0].text;
-        res.json({ analysis: analysisText });
+        // Retornamos a URL da imagem para o frontend.
+        res.json({ screenshot_url: screenshotData.screenshot });
 
     } catch (error) {
         console.error('Erro no backend:', error);
