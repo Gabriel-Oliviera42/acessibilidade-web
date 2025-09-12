@@ -24,16 +24,15 @@ document.getElementById("siteForm").addEventListener("submit", async function(e)
         const data = await response.json();
 
         if (response.ok) {
-            // A API de screenshot já retornou a URL da imagem.
-            // Exibimos a imagem na tela.
+            // Exibimos a imagem na tela e o resultado da análise
             preview.innerHTML = `
                 <h3>Screenshot:</h3>
                 <img src="${data.screenshot_url}" alt="Screenshot de ${url}" style="max-width:100%; border:1px solid #ccc; border-radius:8px;">
             `;
             
             resultado.innerHTML = `
-                <h3>Análise em andamento...</h3>
-                <p>Se a imagem aparecer abaixo, a API de screenshot está funcionando!</p>
+                <h3>Resultado da Análise de Acessibilidade:</h3>
+                <pre>${data.analysis}</pre>
             `;
         } else {
             throw new Error(data.error || 'Erro na requisição.');
