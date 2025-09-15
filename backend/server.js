@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { Buffer } from 'buffer';
+import puppeteer from 'puppeteer';
 
 // Configuração do servidor Express
 const __filename = fileURLToPath(import.meta.url);
@@ -31,27 +32,21 @@ app.post('/analyze', async (req, res) => {
     }
 
     try {
-        // Chaves de API
-        const screenshotApiToken = '0RMJ6EW-MC2MSHH-GCFJMN9-3JZJPTZ';
+        // Chave da API do Gemini
         const geminiApiKey = 'AIzaSyBRE42e2I4yX7EUEAXtJPw6_xAe7hXpY3o';
 
-        // Passo 1: Obter um screenshot da página usando a API
-        const screenshotResponse = await fetch(`https://shot.screenshotapi.net/screenshot?token=${screenshotApiToken}&url=${url}&output=json&full_page=true`);
-        const screenshotData = await screenshotResponse.json();
+        // Passo 1: Obter um screenshot da página usando o Puppeteer
+        const browser = await puppeteer.launch();
+        const page = await browser.newPage();
+        await page.goto(url, { waitUntil: 'networkidle2' });
 
-        // Trata a resposta da API de screenshot
-        if (!screenshotResponse.ok) {
-            console.error('Erro na API de screenshot:', screenshotData);
-            throw new Error(`Erro na API de screenshot: ${screenshotData.error}`);
-        }
-
-        // Passo 2: Baixar a imagem do screenshot e converter para Base64
-        const imageResponse = await fetch(screenshotData.screenshot);
-        const imageArrayBuffer = await imageResponse.arrayBuffer();
-        const base64Image = Buffer.from(imageArrayBuffer).toString('base64');
+        const imageBuffer = await page.screenshot({ fullPage: true });
+        const base64Image = imageBuffer.toString('base64');
         const mimeType = 'image/jpeg';
+        
+        await browser.close();
 
-        // Passo 3: Chamar a API do Gemini para a análise de acessibilidade
+        // Passo 2: Chamar a API do Gemini para a análise de acessibilidade
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`, {
             method: 'POST',
             headers: {
@@ -76,7 +71,7 @@ app.post('/analyze', async (req, res) => {
         }
 
         const analysisText = geminiData.candidates[0].content.parts[0].text;
-        res.json({ analysis: analysisText, screenshot_url: screenshotData.screenshot });
+        res.json({ analysis: analysisText, screenshot_url: `data:${mimeType};base64,${base64Image}` });
 
     } catch (error) {
         // Captura e responde a erros inesperados
