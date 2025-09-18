@@ -46,6 +46,16 @@ app.post('/analyze', async (req, res) => {
         
         await browser.close();
 
+        // Instruções para a IA baseadas nas regras da WCAG 2.2
+        const userQuery = `
+            Análise de Acessibilidade (WCAG 2.2):
+            1. Qual o nível de conformidade (A, AA ou AAA) que o design da página na imagem parece seguir? Justifique brevemente.
+            2. Analise a imagem e identifique de 3 a 5 regras da WCAG 2.2 que parecem estar sendo violadas. Para cada regra:
+               - Cite o nome e o número da regra (ex: "1.4.3 Contraste (Mínimo)").
+               - Descreva a violação específica que você identificou na imagem.
+               - Dê uma sugestão prática de como corrigir o problema.
+        `;
+
         // Passo 2: Chamar a API do Gemini para a análise de acessibilidade
         const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`, {
             method: 'POST',
@@ -55,7 +65,7 @@ app.post('/analyze', async (req, res) => {
             body: JSON.stringify({
                 contents: [{
                     parts: [
-                        { text: `Analise a imagem a seguir e avalie a acessibilidade web, focando em contraste de cores, tamanho e clareza da fonte, e layout geral. Forneça a análise em um parágrafo e, em seguida, liste 3-5 sugestões práticas para melhorar a acessibilidade da página.` },
+                        { text: userQuery },
                         { inlineData: { mimeType, data: base64Image } }
                     ]
                 }]
