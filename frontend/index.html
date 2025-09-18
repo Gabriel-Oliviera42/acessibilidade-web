@@ -8,25 +8,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Acessibilidade Checker</h1>
-  </header>
+    <div class="container">
+        <header>
+            <h1>Acessibilidade Checker</h1>
+        </header>
 
-  <main>
-    <!-- Este formulário captura a URL do site. Quando o usuário clica em "Verificar", o JavaScript (no script.js) lida com o envio. -->
-    <form id="siteForm">
-      <label for="url">Digite a URL para analisar:</label>
-      <input type="url" id="url" placeholder="https://exemplo.com" required>
-      <button type="submit">Verificar</button>
-    </form>
+        <main>
+            <!-- Este formulário captura a URL do site. Quando o usuário clica em "Verificar", o JavaScript (no script.js) lida com o envio. -->
+            <form id="siteForm">
+                <label for="url">Digite a URL para analisar:</label>
+                <input type="url" id="url" placeholder="https://exemplo.com" required>
+                <button type="submit">Verificar</button>
+            </form>
+            <div id="resultado">
+            <!-- Esta seção vai ser preenchida pelo JavaScript com o texto da análise do Gemini, que vem do backend. -->
+            <section id="resultado"></section>
+            <!-- Esta seção vai exibir o screenshot do site, também enviado pelo backend. -->
+            <section id="preview"></section>
+                </div>
+        </main>
 
-    <!-- Esta seção vai ser preenchida pelo JavaScript com o texto da análise do Gemini, que vem do backend. -->
-    <section id="resultado"></section>
-    <!-- Esta seção vai exibir o screenshot do site, também enviado pelo backend. -->
-    <section id="preview"></section>
-  </main>
-
-  <!-- O script.js contém toda a lógica do frontend. Ele envia a URL para o backend e exibe a resposta do servidor na página. -->
-  <script type="module" src="script.js"></script>
+        <!-- O script.js contém toda a lógica do frontend. Ele envia a URL para o backend e exibe a resposta do servidor na página. -->
+        <script type="module" src="script.js"></script>
+        </div>
 </body>
 </html>
