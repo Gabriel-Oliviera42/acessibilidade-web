@@ -48,12 +48,38 @@ app.post('/analyze', async (req, res) => {
 
         // Instruções para a IA baseadas nas regras da WCAG 2.2
         const userQuery = `
-            Análise de Acessibilidade (WCAG 2.2):
-            1. Qual o nível de conformidade (A, AA ou AAA) que o design da página na imagem parece seguir? Justifique brevemente.
-            2. Analise a imagem e identifique de 3 a 5 regras da WCAG 2.2 que parecem estar sendo violadas. Para cada regra:
-               - Cite o nome e o número da regra (ex: "1.4.3 Contraste (Mínimo)").
-               - Descreva a violação específica que você identificou na imagem.
-               - Dê uma sugestão prática de como corrigir o problema.
+            # INSTRUÇÃO MESTRA
+            Atue como uma API de análise de acessibilidade digital, especializada em WCAG 2.2. Sua única fonte de informação é a imagem de uma interface web fornecida. Sua tarefa é retornar um relatório de acessibilidade em um único objeto JSON válido, seguindo as regras e a estrutura abaixo com máxima precisão.
+
+            # REGRAS CRÍTICAS
+            1.  **ANÁLISE ESTRITAMENTE VISUAL:** Sua avaliação deve ser baseada **100% e exclusivamente** nos elementos visuais presentes na imagem. É **PROIBIDO** fazer suposições sobre a qualidade do código-fonte (HTML, CSS, ARIA), performance ou comportamento de leitores de tela.
+            2.  **PRECISÃO ACIMA DE QUANTIDADE:** Seu objetivo principal é a precisão. Identifique apenas violações que são claramente visíveis ou altamente prováveis a partir do design. **Se o design parecer bom e não houver violações claras, Não invente problemas para preencher uma lista.
+            3.  **VIOLAÇÕES PROVÁVEIS:** Se uma violação é uma inferência lógica mas não 100% visível (ex: um ícone de busca sem texto visível *provavelmente* precisa de um texto alternativo), identifique-a, mas marque-a no JSON.
+            4.  **SAÍDA JSON PURA:** A resposta deve ser **apenas** o código JSON, sem nenhum texto, comentário ou formatação de markdown antes ou depois.
+
+            # ESTRUTURA E EXEMPLO DE SAÍDA JSON
+
+            Sua resposta DEVE seguir esta estrutura. 
+
+            {
+            "analiseGeral": {
+                "nivelConformidadeEstimado": "<A, AA ou AAA>",
+                "justificativa": "<Justificativa curta para o nível estimado>",
+                "comentariosGerais": "<Um resumo em texto livre. Se não houver violações, USE ESTE CAMPO para elogiar as boas práticas observadas, como bom contraste, tipografia legível, etc.>"
+            },
+            "violacoesIdentificadas": [
+                {
+                "criterioSucesso": {
+                    "id": "<String, ex: '1.4.3'>",
+                    "nome": "<String, ex: 'Contraste (Mínimo)'>"
+                },
+                "nivelConformidadeCriterio": "<A, AA ou AAA>",
+                "descricaoProblema": "<String descrevendo a violação>",
+                "sugestaoCorrecao": "<String com a sugestão de correção>",
+                "eProvavel": "<Boolean: 'true' se for uma inferência (ex: falta de alt text), 'false' se for diretamente visível (ex: baixo contraste)>"
+                }
+            ]
+            }
         `;
 
         // Passo 2: Chamar a API do Gemini para a análise de acessibilidade

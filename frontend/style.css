@@ -1,8 +1,8 @@
 body {
-    font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter';
     margin: 0;
     padding: 0;
-    background-color: #eef2f5;
+    background-color: #fafdff;
     color: #333;
     display: flex;
     justify-content: center;
@@ -14,21 +14,21 @@ body {
     max-width: 90vw;
     width: 90%;
     padding: 2rem;
-    background-color: #fff;
+    background-color: #fffdfd;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
 header {
-    background: linear-gradient(to right, #007bff, #0056b3);
+    background: linear-gradient(to right, #006fff, #4485df);
     color: white;
     padding: 1.5rem;
     text-align: center;
     border-radius: 10px;
     margin-bottom: 2rem;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 32px;
+    font-weight: 500;
 }
 
 main {
@@ -50,31 +50,31 @@ input {
     padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    font-size: 1rem;
+    font-size: 18px;
     transition: all 0.3s ease;
 }
 
 input:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: #002861;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 button {
     padding: 12px 20px;
     cursor: pointer;
-    background-color: #28a745;
+    background-color: #226DD6;
     color: white;
     border: none;
     border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 500;
     transition: all 0.3s ease;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #5122A9;
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
