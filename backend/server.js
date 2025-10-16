@@ -46,19 +46,17 @@ app.post('/analyze', async (req, res) => {
         
         await browser.close();
 
-        // Instruções para a IA baseadas nas regras da WCAG 2.2
         const userQuery = `
             # INSTRUÇÃO MESTRA
             Atue como uma API de análise de acessibilidade digital, especializada em WCAG 2.2. Sua única fonte de informação é a imagem de uma interface web fornecida. Sua tarefa é retornar um relatório de acessibilidade em um único objeto JSON válido, seguindo as regras e a estrutura abaixo com máxima precisão.
 
             # REGRAS CRÍTICAS
-            1.  **ANÁLISE ESTRITAMENTE VISUAL:** Sua avaliação deve ser baseada **100% e exclusivamente** nos elementos visuais presentes na imagem. É **PROIBIDO** fazer suposições sobre a qualidade do código-fonte (HTML, CSS, ARIA), performance ou comportamento de leitores de tela.
-            2.  **PRECISÃO ACIMA DE QUANTIDADE:** Seu objetivo principal é a precisão. Identifique apenas violações que são claramente visíveis ou altamente prováveis a partir do design. **Se o design parecer bom e não houver violações claras, Não invente problemas para preencher uma lista.
+            1.  **ANÁLISE ESTRITAMENTE VISUAL:** Sua avaliação deve ser baseada **100% e exclusivamente** nos elementos visuais presentes na imagem. É **PROIBIDO** fazer suposições sobre o código-fonte (HTML, CSS, ARIA), performance ou comportamento de leitores de tela.
+            2.  **PRECISÃO ACIMA DE QUANTIDADE:** Seu objetivo principal é a precisão. Identifique apenas violações que são claramente visíveis ou altamente prováveis a partir do design. Se o design parecer bom e não houver violações claras, Não invente problemas.
             3.  **VIOLAÇÕES PROVÁVEIS:** Se uma violação é uma inferência lógica mas não 100% visível (ex: um ícone de busca sem texto visível *provavelmente* precisa de um texto alternativo), identifique-a, mas marque-a no JSON.
-            4.  **SAÍDA JSON PURA:** A resposta deve ser **apenas** o código JSON, sem nenhum texto, comentário ou formatação de markdown antes ou depois.
+            4.  **SAÍDA JSON PURA E EXCLUSIVA:** A resposta deve ser **APENAS** o código JSON. Sua saída deve começar DIRETAMENTE com o caractere '{' e terminar DIRETAMENTE com o caractere '}'. Nenhum outro caractere, texto, explicação, ou formatação de markdown (como \`\`\`) é permitido antes do JSON de abertura ou depois do JSON de fechamento.
 
             # ESTRUTURA E EXEMPLO DE SAÍDA JSON
-
             Sua resposta DEVE seguir esta estrutura. 
 
             {
@@ -76,7 +74,7 @@ app.post('/analyze', async (req, res) => {
                 "nivelConformidadeCriterio": "<A, AA ou AAA>",
                 "descricaoProblema": "<String descrevendo a violação>",
                 "sugestaoCorrecao": "<String com a sugestão de correção>",
-                "eProvavel": "<Boolean: 'true' se for uma inferência (ex: falta de alt text), 'false' se for diretamente visível (ex: baixo contraste)>"
+                "eProvavel": "<Boolean: 'true' se for uma inferência, 'false' se for diretamente visível>"
                 }
             ]
             }

@@ -1,3 +1,5 @@
+// script.js
+
 document.getElementById("siteForm").addEventListener("submit", async function(e) {
     e.preventDefault();
 
@@ -6,14 +8,10 @@ document.getElementById("siteForm").addEventListener("submit", async function(e)
     const analysisTextSection = document.getElementById("analysis-text-section");
     const screenshotSection = document.getElementById("screenshot-section");
     
-    // Exibe o contêiner de resultado e a mensagem de "analisando"
-    resultadoContainer.style.display = 'block';
-    analysisTextSection.innerHTML = `
-        <p>Analisando a URL:</p>
-        <strong>${url}</strong>
-        <p>Aguarde, isso pode levar alguns segundos...</p>
-    `;
-    screenshotSection.innerHTML = ''; // Limpa a seção da imagem
+    // Mostra o contêiner e a mensagem de "analisando"
+    resultadoContainer.style.display = 'grid'; // Usamos grid para o layout
+    analysisTextSection.innerHTML = `<p>Analisando <strong>${url}</strong>... Isso pode levar alguns segundos.</p>`;
+    screenshotSection.innerHTML = ''; // Limpa a imagem antiga
 
     try {
         const response = await fetch('http://localhost:3000/analyze', {
@@ -27,14 +25,15 @@ document.getElementById("siteForm").addEventListener("submit", async function(e)
         const data = await response.json();
 
         if (response.ok) {
-            // Remove a mensagem de "analisando"
-            analysisTextSection.innerHTML = `<h3>Resultado da Análise de Acessibilidade:</h3>`;
+            // **A MÁGICA ACONTECE AQUI**
+            // 1. Pegamos o TEXTO da análise.
+            // 2. Usamos JSON.parse() para transformar o TEXTO em um OBJETO que o JavaScript entende.
+            const reportData = JSON.parse(data.analysis);
 
-            // Processa o texto da análise para formatar a lista
-            const formattedAnalysis = formatAnalysisText(data.analysis);
-            analysisTextSection.innerHTML += formattedAnalysis;
+            // 3. Usamos o objeto para criar o HTML bonito com uma função auxiliar.
+            analysisTextSection.innerHTML = createReportHTML(reportData);
 
-            // Exibimos a imagem na tela
+            // 4. Exibimos o screenshot.
             screenshotSection.innerHTML = `
                 <h3>Screenshot da Página:</h3>
                 <img src="${data.screenshot_url}" alt="Screenshot de ${url}">
@@ -50,34 +49,43 @@ document.getElementById("siteForm").addEventListener("submit", async function(e)
     }
 });
 
-// Nova função mais robusta para formatar o texto da análise.
-function formatAnalysisText(text) {
-    // Substitui as quebras de linha duplas por parágrafos
-    let formattedText = text.replace(/\n\n/g, '</p><p>');
+/**
+ * Cria o HTML do relatório a partir do objeto de dados da análise.
+ * @param {object} reportData - O objeto JavaScript contendo a análise.
+ * @returns {string} - A string HTML formatada.
+ */
+function createReportHTML(reportData) {
+    const { analiseGeral, violacoesIdentificadas } = reportData;
 
-    // Substitui títulos com "##" ou "###"
-    formattedText = formattedText.replace(/###\s*(.*)/g, '<h4>$1</h4>');
-    formattedText = formattedText.replace(/##\s*(.*)/g, '<h3>$1</h3>');
+    // Cria a seção de Análise Geral
+    let html = `
+        <div class="geral-info">
+            <h3>Análise Geral</h3>
+            <p><strong>Nível de Conformidade Estimado:</strong> ${analiseGeral.nivelConformidadeEstimado}</p>
+            <p><strong>Justificativa:</strong> ${analiseGeral.justificativa}</p>
+            <p><strong>Comentários Gerais:</strong> ${analiseGeral.comentariosGerais}</p>
+        </div>
+    `;
 
-    // Remove asteriscos duplos e underscores
-    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    formattedText = formattedText.replace(/__(.*?)__/g, '<strong>$1</strong>');
-
-    // Converte listas numeradas e com asteriscos em HTML
-    formattedText = formattedText.replace(/^\*\s*(.*)/gm, '<li>$1</li>');
-    formattedText = formattedText.replace(/^\d+\.\s*(.*)/gm, '<li>$1</li>');
-    if (formattedText.includes('<li>')) {
-        formattedText = `<ul>${formattedText}</ul>`;
+    // Cria os cards para cada violação
+    if (violacoesIdentificadas && violacoesIdentificadas.length > 0) {
+        html += `<h3>Violações Identificadas (${violacoesIdentificadas.length})</h3>`;
+        
+        violacoesIdentificadas.forEach(violacao => {
+            html += `
+                <div class="violation-card">
+                    <h4>${violacao.criterioSucesso.nome} (Critério ${violacao.criterioSucesso.id} - Nível ${violacao.nivelConformidadeCriterio})</h4>
+                    <p class="problema"><span class="label">Problema:</span> ${violacao.descricaoProblema}</p>
+                    <div class="suggestion">
+                        <p><span class="label">Sugestão:</span> ${violacao.sugestaoCorrecao}</p>
+                    </div>
+                    <p class="tipo-violacao"><em>Violação ${violacao.eProvavel ? 'Provável (Inferida)' : 'Visível Diretamente'}</em></p>
+                </div>
+            `;
+        });
+    } else {
+        html += `<h3>🎉 Nenhuma violação identificada!</h3>`;
     }
 
-    // Envolve o texto restante em parágrafos
-    if (!formattedText.startsWith('<p>') && !formattedText.startsWith('<ul>') && !formattedText.startsWith('<h3>') && !formattedText.startsWith('<h4>')) {
-        formattedText = `<p>${formattedText}</p>`;
-    }
-
-    // Trata o início e fim de listas
-    formattedText = formattedText.replace(/<\/li>\n<li>/g, '</li><li>');
-    formattedText = formattedText.replace(/<\/ul>\n<ul>/g, '</ul><ul>');
-    
-    return formattedText;
+    return html;
 }
